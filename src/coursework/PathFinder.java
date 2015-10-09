@@ -13,10 +13,10 @@ public class PathFinder {
 	}
 
 	private void start() {
-		tree = new Tree(10);
+		tree = new Tree(3, new char[] { 'A', '1', '2', '3' });
 		breadthFirstSearch();
-		tree.refresh();
-		depthFirstSearch();
+		// tree.refresh();
+		// depthFirstSearch();
 	}
 
 	private void countPath(Node n) {
@@ -27,7 +27,7 @@ public class PathFinder {
 			path.add(n);
 			n = n.getParent();
 		}
-		if (height < 10) {
+		if (height < 20) {
 			for (int i = path.size() - 1; i >= 0; --i) {
 				tree.printState(path.get(i).getState().getStateArray());
 			}
@@ -38,19 +38,23 @@ public class PathFinder {
 	private boolean isFinalState(Node n) {
 		State s = n.getState();
 		char[][] stateArray = s.getStateArray();
+		char[][] finalArray = tree.getFinalStateArray();
 		for (int x = 0; x < stateArray[0].length; ++x) {
 			for (int y = 0; y < stateArray.length; ++y) {
-				if (stateArray[y][x] == '1') {
-					if (y + 2 < stateArray.length) {
-						if (stateArray[y + 1][x] == '2' && stateArray[y + 2][x] == '3') {
-							return true;
-						}
+				if (stateArray[y][x] != finalArray[y][x]) {
+					if (stateArray[y][x] == 'A' || finalArray[y][x] == 'N') {
+						continue;
 					}
-					return false;
+					// else if(stateArray[y][x] == 'N' && finalArray[y][x] == 'A'){
+					// continue;
+					// }
+					else {
+						return false;
+					}
 				}
 			}
 		}
-		return false;
+		return true;
 	}
 
 	private Node depthFirstSearch() {

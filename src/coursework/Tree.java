@@ -15,18 +15,34 @@ public class Tree {
 		for(int x = 0; x < startStateArray[0].length; ++x){
 			for(int y = 0; y < startStateArray.length; ++y){
 				startStateArray[y][x] = 'N';
-				finalStateArray[y][x] = 'N';
 			}
 		}
 		for(int i = 0; i < chars.length; ++i){
 			placeChar(startStateArray, chars[i], n);
-			placeChar(finalStateArray, chars[i], n);
 		}
+		generateFinalState(n, chars);
 		refresh();
 	}
 	
 	public char[][] getFinalStateArray(){
 		return finalStateArray;
+	}
+	
+	private void generateFinalState(int n, char[] chars){
+		while(true){
+			finalStateArray = new char[n][n];
+			for(int x = 0; x < startStateArray[0].length; ++x){
+				for(int y = 0; y < startStateArray.length; ++y){
+					finalStateArray[y][x] = 'N';
+				}
+			}
+			for(int i = 0; i < chars.length; ++i){
+				placeChar(finalStateArray, chars[i], n);
+			}
+			if(!finalStateArray.equals(startStateArray)){
+				break;
+			}
+		}
 	}
 	
 	private void placeChar(char[][] arr, char c, int n){
