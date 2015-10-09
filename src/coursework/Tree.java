@@ -18,7 +18,7 @@ public class Tree {
 			}
 		}
 		for(int i = 0; i < chars.length; ++i){
-			placeChar(startStateArray, chars[i], n);
+			placeChar(startStateArray, chars[i], n, true);
 		}
 		generateFinalState(n, chars);
 		refresh();
@@ -37,7 +37,7 @@ public class Tree {
 				}
 			}
 			for(int i = 0; i < chars.length; ++i){
-				placeChar(finalStateArray, chars[i], n);
+				placeChar(finalStateArray, chars[i], n, false);
 			}
 			if(!finalStateArray.equals(startStateArray)){
 				break;
@@ -45,7 +45,7 @@ public class Tree {
 		}
 	}
 	
-	private void placeChar(char[][] arr, char c, int n){
+	private void placeChar(char[][] arr, char c, int n, boolean placeAgent){
 		Random rand = new Random();
 		boolean placeFound = false;
 		while(!placeFound){
@@ -53,9 +53,10 @@ public class Tree {
 			int y = rand.nextInt(n);
 			if(arr[y][x] == 'N'){
 				arr[y][x] = c;
-				if(c == 'A'){
+				if(c == 'A' && placeAgent){
 					agentX = y;
 					agentY = x;
+					arr[y][x] = 'N';
 				}
 				placeFound = true;
 			}

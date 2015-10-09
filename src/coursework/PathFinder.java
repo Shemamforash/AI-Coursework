@@ -13,7 +13,7 @@ public class PathFinder {
 	}
 
 	private void start() {
-		tree = new Tree(3, new char[] { 'A', '1', '2', '3' });
+		tree = new Tree(5, new char[] { 'A', '1', '2', '3', '4'});
 		breadthFirstSearch();
 		// tree.refresh();
 		// depthFirstSearch();
@@ -27,12 +27,13 @@ public class PathFinder {
 			path.add(n);
 			n = n.getParent();
 		}
-		if (height < 20) {
-			for (int i = path.size() - 1; i >= 0; --i) {
-				tree.printState(path.get(i).getState().getStateArray());
-			}
+		for (int i = path.size() - 1; i >= 0; --i) {
+			System.out.println("Height: " + (path.size() - 1 - i));
+			tree.printState(path.get(i).getState().getStateArray());
 		}
-		System.out.println(height);
+		
+		System.out.println("Final State");
+		tree.printState(tree.getFinalStateArray());
 	}
 
 	private boolean isFinalState(Node n) {
@@ -42,13 +43,11 @@ public class PathFinder {
 		for (int x = 0; x < stateArray[0].length; ++x) {
 			for (int y = 0; y < stateArray.length; ++y) {
 				if (stateArray[y][x] != finalArray[y][x]) {
-					if (stateArray[y][x] == 'A' || finalArray[y][x] == 'N') {
+					if (stateArray[y][x] == 'A' && finalArray[y][x] == 'N') {
 						continue;
-					}
-					// else if(stateArray[y][x] == 'N' && finalArray[y][x] == 'A'){
-					// continue;
-					// }
-					else {
+					} else if (stateArray[y][x] == 'N' && finalArray[y][x] == 'A') {
+						continue;
+					} else {
 						return false;
 					}
 				}
@@ -69,8 +68,8 @@ public class PathFinder {
 				ArrayList<Node> nodes = expandNodes(node);
 				for (Node n : nodes) {
 					if (isFinalState(n)) {
-						System.out.println("DepthFS Time = " + ((float) System.nanoTime() - startTime) / 1000000000f);
 						countPath(n);
+						System.out.println("DepthFS Time = " + ((float) System.nanoTime() - startTime) / 1000000000f);
 						return n;
 					}
 					nodeStack.push(n);
@@ -109,8 +108,8 @@ public class PathFinder {
 			ArrayList<Node> nodes = expandNodes(node);
 			for (Node n : nodes) {
 				if (isFinalState(n)) {
-					System.out.println("BreadthFS Time = " + ((float) System.nanoTime() - startTime) / 1000000000f);
 					countPath(n);
+					System.out.println("BreadthFS Time = " + ((float) System.nanoTime() - startTime) / 1000000000f);
 					return n;
 				}
 				nodeQueue.add(n);
