@@ -5,27 +5,16 @@ import java.util.LinkedList;
 import java.util.Stack;
 
 public class PathFinder {
-	private Tree	tree;
+	private Tree tree;
 
-	public enum Algorithm {
-		BREADTH_FIRST, DEPTH_FIRST, ITERATIVE_DEEPENING, ASTAR
-	};
+	public static void main(String[] args) {
+		PathFinder p = new PathFinder();
+		p.go();
+	}
 
-	private ArrayList<Node> getPath(Algorithm algorithmType, int n) {
-		tree = new Tree(n, new char[] { 'A', '1', '2', '3', '4' });
-		switch (algorithmType) {
-			case BREADTH_FIRST:
-				return countPath(breadthFirstSearch());
-			case DEPTH_FIRST:
-				return countPath(depthFirstSearch());
-			case ITERATIVE_DEEPENING:
-				break;
-			case ASTAR:
-				break;
-			default:
-				break;
-		}
-		return null;
+	private void go() {
+		countPath(breadthFirstSearch());
+		countPath(depthFirstSearch());
 	}
 
 	private ArrayList<Node> countPath(Node n) {
@@ -37,12 +26,12 @@ public class PathFinder {
 			n = n.getParent();
 		}
 		for (int i = path.size() - 1; i >= 0; --i) {
-			// System.out.println("Height: " + (path.size() - 1 - i));
-			// tree.printState(path.get(i).getState().getStateArray());
+			System.out.println("Height: " + (path.size() - 1 - i));
+			tree.printState(path.get(i).getState().getStateArray());
 		}
 
-		// System.out.println("Final State");
-		// tree.printState(tree.getFinalStateArray());
+		System.out.println("Final State");
+		tree.printState(tree.getFinalStateArray());
 		return path;
 	}
 

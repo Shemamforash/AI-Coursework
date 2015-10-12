@@ -5,6 +5,7 @@ import java.util.Arrays;
 public class State {
 	private char[][]	stateArray;
 	private int			agentX, agentY;
+	private int heuristicEstimate;
 
 	public State(State prevState, char dir) {
 		char[][] oldArray = prevState.getStateArray();
