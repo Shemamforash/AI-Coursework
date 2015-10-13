@@ -13,8 +13,10 @@ public class PathFinder {
 	}
 
 	private void go() {
+		tree = new Tree(4, new char[]{'A', '1', '2', '3'});
 		countPath(breadthFirstSearch());
-		countPath(depthFirstSearch());
+//		tree.refresh();
+//		countPath(depthFirstSearch());
 	}
 
 	private ArrayList<Node> countPath(Node n) {
@@ -31,14 +33,14 @@ public class PathFinder {
 		}
 
 		System.out.println("Final State");
-		tree.printState(tree.getFinalStateArray());
+		tree.printState(tree.getFinalState().getStateArray());
 		return path;
 	}
 
 	private boolean isFinalState(Node n) {
 		State s = n.getState();
 		char[][] stateArray = s.getStateArray();
-		char[][] finalArray = tree.getFinalStateArray();
+		char[][] finalArray = tree.getFinalState().getStateArray();
 		for (int x = 0; x < stateArray[0].length; ++x) {
 			for (int y = 0; y < stateArray.length; ++y) {
 				if (stateArray[y][x] != finalArray[y][x]) {
