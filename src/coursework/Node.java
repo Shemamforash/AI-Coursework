@@ -1,12 +1,11 @@
 package coursework;
 
-import java.util.ArrayList;
-
 public class Node {
 	private State	state;
 	private Node	parent, upNode, downNode, leftNode, rightNode;
 	private Boolean	visited	= false;
 	private Tree	tree;
+<<<<<<< HEAD
 	private int heuristicEstimate = 0;
 	private ArrayList<Node> children = new ArrayList<Node>();
 	
@@ -68,9 +67,15 @@ public class Node {
 		int xDiff = Math.abs(a.x() - b.x());
 		int yDiff = Math.abs(a.y() - b.y());
 		return xDiff + yDiff;
+=======
+
+	public Node(State state, Node parent, Tree tree) {
+		this.tree = tree;
+		this.state = state;
+		this.parent = parent;
+>>>>>>> parent of 4662b1d... moving to tree creation beforehand
 	}
 
-	
 	public State getState() {
 		return state;
 	}

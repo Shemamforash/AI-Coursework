@@ -31,7 +31,27 @@ public class State {
 		agent = new CharacterPosition('A', prevState.getAgentX(), prevState.getAgentY());
 		this.move(dir);
 	}
-	
+
+	public int getHeuristicEstimate() {
+		ArrayList<CharacterPosition> finalChars = tree.getFinalCharacterPositions();
+		int heuristicEstimate = 0;
+		for (int i = 0; i < finalChars.size(); ++i) {
+			for (int j = 0; j < characterPositions.size(); ++j) {
+				if (finalChars.get(i).getChar() == characterPositions.get(j).getChar()) {
+					int estimatedDistance = getEstimatedDistance(characterPositions.get(j), finalChars.get(i));
+					heuristicEstimate += estimatedDistance;
+				}
+			}
+		}
+		return heuristicEstimate;
+	}
+
+	private int getEstimatedDistance(CharacterPosition a, CharacterPosition b) {
+		int xDiff = Math.abs(a.x() - b.x());
+		int yDiff = Math.abs(a.y() - b.y());
+		return xDiff + yDiff;
+	}
+
 	public State(char[][] stateArray, Tree tree) {
 		this.tree = tree;
 		this.stateArray = new char[stateArray.length][stateArray.length];

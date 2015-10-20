@@ -1,14 +1,11 @@
 package coursework;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.LinkedList;
-import java.util.PriorityQueue;
 import java.util.Stack;
 
 public class PathFinder {
-	private Tree	tree;
-	private float	bfsTime	= 0, dfsTime = 0, aStarTime = 0, bfsAverageNodes = 0, dfsAverageNodes = 0, aStarAverageNodes = 0;
+	private Tree tree;
 
 	public static void main(String[] args) {
 		PathFinder p = new PathFinder();
@@ -16,6 +13,7 @@ public class PathFinder {
 	}
 
 	private void go() {
+<<<<<<< HEAD
 		char[] intchars = new char[] { '1', '2', '3', '4', '5', '6', '7', '8', '9', '0' };
 		for (int difficulty = 3; difficulty < 4; ++difficulty) {
 			char[] charArr = new char[difficulty + 1];
@@ -50,6 +48,12 @@ public class PathFinder {
 			dfsAverageNodes = 0;
 			aStarAverageNodes = 0;
 		}
+=======
+		tree = new Tree(4, new char[] { 'A', '1', '2', '3' });
+		countPath(breadthFirstSearch());
+		// tree.refresh();
+		// countPath(depthFirstSearch());
+>>>>>>> parent of 4662b1d... moving to tree creation beforehand
 	}
 
 	private ArrayList<Node> countPath(Node n) {
@@ -62,12 +66,22 @@ public class PathFinder {
 				n = n.getParent();
 			}
 			for (int i = path.size() - 1; i >= 0; --i) {
+<<<<<<< HEAD
 //				 System.out.println("Height: " + (path.size() - 1 - i) + " Estimate: " + path.get(i).getHeuristicEstimate());
 //				 tree.printState(path.get(i).getState().getStateArray());
 			}
 
 //			System.out.println("Final State");
 //			tree.printState(tree.getFinalState().getStateArray());
+=======
+				System.out.println("Height: " + (path.size() - 1 - i) + " Estimate: "
+						+ path.get(i).getState().getHeuristicEstimate());
+				tree.printState(path.get(i).getState().getStateArray());
+			}
+
+			System.out.println("Final State");
+			tree.printState(tree.getFinalState().getStateArray());
+>>>>>>> parent of 4662b1d... moving to tree creation beforehand
 		}
 		return path;
 	}
@@ -96,6 +110,7 @@ public class PathFinder {
 		nodeStack.push(tree.getInitialNode());
 
 		while (!nodeStack.isEmpty()) {
+<<<<<<< HEAD
 			Node currentNode = nodeStack.pop();
 			if (!currentNode.getVisited()) {
 				currentNode.setVisited(true);
@@ -103,6 +118,16 @@ public class PathFinder {
 				for (Node n : currentNode.getChildren()) {
 					if (isFinalState(n)) {
 						dfsTime += ((float) System.nanoTime() - startTime) / 1000000000f;
+=======
+			Node node = nodeStack.pop();
+			if (!node.getVisited()) {
+				node.setVisited(true);
+				ArrayList<Node> nodes = expandNodes(node);
+				for (Node n : nodes) {
+					if (isFinalState(n)) {
+						countPath(n);
+						System.out.println("DepthFS Time = " + ((float) System.nanoTime() - startTime) / 1000000000f);
+>>>>>>> parent of 4662b1d... moving to tree creation beforehand
 						return n;
 					}
 					nodeStack.push(n);
@@ -112,6 +137,7 @@ public class PathFinder {
 		return null;
 	}
 
+<<<<<<< HEAD
 	private class HeuristicEstimateComparator implements Comparator<Node> {
 		public int compare(Node n1, Node n2) {
 			int n1Estimate = n1.getHeuristicEstimate();
@@ -151,6 +177,23 @@ public class PathFinder {
 			}
 		}
 		return null;
+=======
+	private ArrayList<Node> expandNodes(Node node) {
+		ArrayList<Node> nodes = new ArrayList<Node>();
+		if (node.generateDownNode()) {
+			nodes.add(node.getDown());
+		}
+		if (node.generateUpNode()) {
+			nodes.add(node.getUp());
+		}
+		if (node.generateRightNode()) {
+			nodes.add(node.getRight());
+		}
+		if (node.generateLeftNode()) {
+			nodes.add(node.getLeft());
+		}
+		return nodes;
+>>>>>>> parent of 4662b1d... moving to tree creation beforehand
 	}
 
 	private Node breadthFirstSearch() {
@@ -161,11 +204,19 @@ public class PathFinder {
 			return tree.getInitialNode();
 		}
 		while (!nodeQueue.isEmpty()) {
+<<<<<<< HEAD
 			Node currentNode = nodeQueue.remove();
 			++bfsAverageNodes;
 			for (Node n : currentNode.getChildren()) {
 				if (isFinalState(n)) {
 					bfsTime += ((float) System.nanoTime() - startTime) / 1000000000f;
+=======
+			Node node = nodeQueue.remove();
+			ArrayList<Node> nodes = expandNodes(node);
+			for (Node n : nodes) {
+				if (isFinalState(n)) {
+					System.out.println("BreadthFS Time = " + ((float) System.nanoTime() - startTime) / 1000000000f);
+>>>>>>> parent of 4662b1d... moving to tree creation beforehand
 					return n;
 				}
 				nodeQueue.add(n);
