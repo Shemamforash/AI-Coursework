@@ -5,7 +5,7 @@ import java.util.Random;
 
 public class Tree {
 	private Node startNode;
-	private ArrayList<State> existingStates;
+	private ArrayList<State> existingStates = new ArrayList<State>();
 	private State startState;
 	private State finalState;
 	private int agentX, agentY;
@@ -27,7 +27,9 @@ public class Tree {
 		}
 		startState = new State(startStateArray, this);
 		generateFinalState(n, chars);
-		refresh();
+		existingStates.add(startState);
+		startNode = new Node(startState, null, this);
+		printState(startStateArray);
 	}
 
 	public State getFinalState() {
@@ -76,12 +78,6 @@ public class Tree {
 		return cp;
 	}
 
-	public void refresh() {
-		existingStates = new ArrayList<State>();
-		addStateToExisting(startState);
-		startNode = new Node(startState, null, this);
-	}
-
 	public void printState(char[][] s) {
 		for (int y = 0; y < s[0].length; ++y) {
 			for (int x = 0; x < s.length; ++x) {
@@ -92,22 +88,18 @@ public class Tree {
 		System.out.println();
 	}
 
-	public boolean stateExists(State state) {
+	public boolean addState(State state) {
 		for (State s : existingStates) {
 			if (s.equals(state)) {
 				return true;
 			}
 		}
-		addStateToExisting(state);
+		existingStates.add(state);
 		return false;
 	}
 
 	public Node getInitialNode() {
 		return startNode;
-	}
-
-	private void addStateToExisting(State state) {
-		existingStates.add(state);
 	}
 
 	public int getSize() {

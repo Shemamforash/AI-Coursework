@@ -4,10 +4,23 @@ import java.util.ArrayList;
 
 public class Node {
 	private State	state;
-	private Node	leftNode, rightNode, upNode, downNode, parent;
+	private Node	parent, upNode, downNode, leftNode, rightNode;
 	private Boolean	visited	= false;
 	private Tree	tree;
 	private int heuristicEstimate = 0;
+	private ArrayList<Node> children = new ArrayList<Node>();
+	
+	public Node(State state, Node parent, Tree tree) {
+		this.tree = tree;
+		this.state = state;
+		this.parent = parent;
+		heuristicEstimate = calculateHeuristic(state, tree.getFinalState());
+		if(parent == null || parent.getParent() == null){
+			expandNodes();
+//			tree.printState(state.getStateArray());
+			System.out.println("Children " + children.size());
+		}
+	}
 	
 	public int getHeuristicEstimate(){
 		return heuristicEstimate;
@@ -17,13 +30,25 @@ public class Node {
 		this.heuristicEstimate = heuristicEstimate;
 	}
 
-	public Node(State state, Node parent, Tree tree) {
-		this.tree = tree;
-		this.state = state;
-		this.parent = parent;
-		heuristicEstimate = calculateHeuristic(state, tree.getFinalState());
+	public ArrayList<Node> getChildren(){
+		return children;
 	}
-
+	
+	private void expandNodes() {
+		if (generateDownNode()) {
+			children.add(downNode);
+		}
+		if (generateUpNode()) {
+			children.add(upNode);
+		}
+		if (generateRightNode()) {
+			children.add(rightNode);
+		}
+		if (generateLeftNode()) {
+			children.add(leftNode);
+		}
+	}
+	
 	private int calculateHeuristic(State aState, State bState) {
 		ArrayList<CharacterPosition> aList = aState.getCharacterPositions();
 		ArrayList<CharacterPosition> bList = bState.getCharacterPositions();
@@ -60,7 +85,9 @@ public class Node {
 
 	public boolean generateLeftNode() {
 		State leftState = new State(state, 'L', tree);
-		if (!tree.stateExists(leftState)) {
+		System.out.println("Left");
+		tree.printState(leftState.getStateArray());
+		if (!tree.addState(leftState)) {
 			leftNode = new Node(leftState, this, tree);
 			return true;
 		}
@@ -69,7 +96,9 @@ public class Node {
 
 	public boolean generateRightNode() {
 		State rightState = new State(state, 'R', tree);
-		if (!tree.stateExists(rightState)) {
+		System.out.println("Right");
+		tree.printState(rightState.getStateArray());
+		if (!tree.addState(rightState)) {
 			rightNode = new Node(rightState, this, tree);
 			return true;
 		}
@@ -78,7 +107,9 @@ public class Node {
 
 	public boolean generateUpNode() {
 		State upState = new State(state, 'U', tree);
-		if (!tree.stateExists(upState)) {
+		System.out.println("Up");
+		tree.printState(upState.getStateArray());
+		if (!tree.addState(upState)) {
 			upNode = new Node(upState, this, tree);
 			return true;
 		}
@@ -87,29 +118,15 @@ public class Node {
 
 	public boolean generateDownNode() {
 		State downState = new State(state, 'D', tree);
-		if (!tree.stateExists(downState)) {
+		System.out.println("Down");
+		tree.printState(downState.getStateArray());
+		if (!tree.addState(downState)) {
 			downNode = new Node(downState, this, tree);
 			return true;
 		}
 		return false;
 	}
-
-	public Node getLeft() {
-		return leftNode;
-	}
-
-	public Node getRight() {
-		return rightNode;
-	}
-
-	public Node getUp() {
-		return upNode;
-	}
-
-	public Node getDown() {
-		return downNode;
-	}
-
+	
 	public Node getParent() {
 		return parent;
 	}

@@ -16,22 +16,20 @@ public class PathFinder {
 	}
 
 	private void go() {
-		for (int difficulty = 3; difficulty < 7; ++difficulty) {
-			char[] charArr = new char[3 + 1];
+		char[] intchars = new char[] { '1', '2', '3', '4', '5', '6', '7', '8', '9', '0' };
+		for (int difficulty = 3; difficulty < 4; ++difficulty) {
+			char[] charArr = new char[difficulty + 1];
 			charArr[0] = 'A';
-			for (int i = 0; i < 3; ++i) {
-				charArr[i + 1] = (char) (i + 1);
+			for (int i = 0; i < difficulty; ++i) {
+				charArr[i + 1] = intchars[i];
 			}
-			tree = new Tree(difficulty, charArr);
 			int repetitions = 1;
 			for (int i = 0; i < repetitions; ++i) {
-				countPath(breadthFirstSearch());
-				tree.refresh();
-				countPath(depthFirstSearch());
-				tree.refresh();
-				countPath(aStar()); 
-				tree.refresh();
 				tree = new Tree(difficulty, charArr);
+				System.out.println(tree.getSize());
+				countPath(breadthFirstSearch());
+				countPath(depthFirstSearch());
+				countPath(aStar());
 			}
 			System.out.println("--- FINISHED ---");
 			System.out.println("Difficulty: " + difficulty);
@@ -45,6 +43,12 @@ public class PathFinder {
 			System.out.println("-- A* Search Averages --");
 			System.out.println("Time: " + aStarTime / repetitions);
 			System.out.println("Nodes: " + aStarAverageNodes / repetitions);
+			bfsTime = 0;
+			dfsTime = 0;
+			aStarTime = 0;
+			bfsAverageNodes = 0;
+			dfsAverageNodes = 0;
+			aStarAverageNodes = 0;
 		}
 	}
 
@@ -58,12 +62,12 @@ public class PathFinder {
 				n = n.getParent();
 			}
 			for (int i = path.size() - 1; i >= 0; --i) {
-				// System.out.println("Height: " + (path.size() - 1 - i) + " Estimate: " + path.get(i).getHeuristicEstimate());
-				// tree.printState(path.get(i).getState().getStateArray());
+//				 System.out.println("Height: " + (path.size() - 1 - i) + " Estimate: " + path.get(i).getHeuristicEstimate());
+//				 tree.printState(path.get(i).getState().getStateArray());
 			}
 
-			// System.out.println("Final State");
-			// tree.printState(tree.getFinalState().getStateArray());
+//			System.out.println("Final State");
+//			tree.printState(tree.getFinalState().getStateArray());
 		}
 		return path;
 	}
@@ -92,15 +96,12 @@ public class PathFinder {
 		nodeStack.push(tree.getInitialNode());
 
 		while (!nodeStack.isEmpty()) {
-			Node node = nodeStack.pop();
-			if (!node.getVisited()) {
-				node.setVisited(true);
-				ArrayList<Node> nodes = expandNodes(node);
+			Node currentNode = nodeStack.pop();
+			if (!currentNode.getVisited()) {
+				currentNode.setVisited(true);
 				++dfsAverageNodes;
-				for (Node n : nodes) {
+				for (Node n : currentNode.getChildren()) {
 					if (isFinalState(n)) {
-						countPath(n);
-						// System.out.println("DepthFS Time = " + ((float) System.nanoTime() - startTime) / 1000000000f);
 						dfsTime += ((float) System.nanoTime() - startTime) / 1000000000f;
 						return n;
 					}
@@ -109,23 +110,6 @@ public class PathFinder {
 			}
 		}
 		return null;
-	}
-
-	private ArrayList<Node> expandNodes(Node node) {
-		ArrayList<Node> nodes = new ArrayList<Node>();
-		if (node.generateDownNode()) {
-			nodes.add(node.getDown());
-		}
-		if (node.generateUpNode()) {
-			nodes.add(node.getUp());
-		}
-		if (node.generateRightNode()) {
-			nodes.add(node.getRight());
-		}
-		if (node.generateLeftNode()) {
-			nodes.add(node.getLeft());
-		}
-		return nodes;
 	}
 
 	private class HeuristicEstimateComparator implements Comparator<Node> {
@@ -150,14 +134,13 @@ public class PathFinder {
 		while (!unvisitedNodes.isEmpty()) {
 			Node currentNode = unvisitedNodes.remove();
 			if (isFinalState(currentNode)) {
-				// System.out.println("A* Time = " + ((float) System.nanoTime() - startTime) / 1000000000f);
 				aStarTime += ((float) System.nanoTime() - startTime) / 1000000000f;
 				return currentNode;
 			}
 
 			visitedNodes.add(currentNode);
 			++aStarAverageNodes;
-			for (Node n : expandNodes(currentNode)) {
+			for (Node n : currentNode.getChildren()) {
 				int gVal = currentNode.getHeuristicEstimate() + Math.abs(currentNode.getHeuristicEstimate() - n.getHeuristicEstimate());
 				unvisitedNodes.add(n);
 				if (gVal >= n.getHeuristicEstimate()) {
@@ -178,13 +161,10 @@ public class PathFinder {
 			return tree.getInitialNode();
 		}
 		while (!nodeQueue.isEmpty()) {
-			Node node = nodeQueue.remove();
-			ArrayList<Node> nodes = expandNodes(node);
-
+			Node currentNode = nodeQueue.remove();
 			++bfsAverageNodes;
-			for (Node n : nodes) {
+			for (Node n : currentNode.getChildren()) {
 				if (isFinalState(n)) {
-					// System.out.println("BreadthFS Time = " + ((float) System.nanoTime() - startTime) / 1000000000f);
 					bfsTime += ((float) System.nanoTime() - startTime) / 1000000000f;
 					return n;
 				}
