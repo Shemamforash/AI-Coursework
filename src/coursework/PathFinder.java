@@ -13,27 +13,30 @@ public class PathFinder {
 	}
 
 	private void go() {
-		tree = new Tree(4, new char[]{'A', '1', '2', '3'});
+		tree = new Tree(4, new char[] { 'A', '1', '2', '3' });
 		countPath(breadthFirstSearch());
-//		tree.refresh();
-//		countPath(depthFirstSearch());
+		// tree.refresh();
+		// countPath(depthFirstSearch());
 	}
 
 	private ArrayList<Node> countPath(Node n) {
 		ArrayList<Node> path = new ArrayList<Node>();
-		int height = 0;
-		while (n.getParent() != null) {
-			++height;
-			path.add(n);
-			n = n.getParent();
-		}
-		for (int i = path.size() - 1; i >= 0; --i) {
-			System.out.println("Height: " + (path.size() - 1 - i));
-			tree.printState(path.get(i).getState().getStateArray());
-		}
+		if (n != null) {
+			int height = 0;
+			while (n.getParent() != null) {
+				++height;
+				path.add(n);
+				n = n.getParent();
+			}
+			for (int i = path.size() - 1; i >= 0; --i) {
+				System.out.println("Height: " + (path.size() - 1 - i) + " Estimate: "
+						+ path.get(i).getState().getHeuristicEstimate());
+				tree.printState(path.get(i).getState().getStateArray());
+			}
 
-		System.out.println("Final State");
-		tree.printState(tree.getFinalState().getStateArray());
+			System.out.println("Final State");
+			tree.printState(tree.getFinalState().getStateArray());
+		}
 		return path;
 	}
 
@@ -41,12 +44,12 @@ public class PathFinder {
 		State s = n.getState();
 		char[][] stateArray = s.getStateArray();
 		char[][] finalArray = tree.getFinalState().getStateArray();
-		for (int x = 0; x < stateArray[0].length; ++x) {
-			for (int y = 0; y < stateArray.length; ++y) {
-				if (stateArray[y][x] != finalArray[y][x]) {
-					if (stateArray[y][x] == 'A' && finalArray[y][x] == 'N') {
+		for (int y = 0; y < stateArray[0].length; ++y) {
+			for (int x = 0; x < stateArray.length; ++x) {
+				if (stateArray[x][y] != finalArray[x][y]) {
+					if (stateArray[x][y] == 'A' && finalArray[x][y] == 'N') {
 						continue;
-					} else if (stateArray[y][x] == 'N' && finalArray[y][x] == 'A') {
+					} else if (stateArray[x][y] == 'N' && finalArray[x][y] == 'A') {
 						continue;
 					} else {
 						return false;

@@ -5,22 +5,8 @@ import java.util.Arrays;
 
 public class State {
 	private char[][] stateArray;
-	private int heuristicEstimate;
 	private ArrayList<CharacterPosition> characterPositions = new ArrayList<CharacterPosition>();
 	private CharacterPosition agent;
-
-	private CharacterPosition getAgent() {
-		if (agent == null) {
-			for (int i = 0; i < characterPositions.size(); ++i) {
-				if (characterPositions.get(i).getChar() == 'A') {
-					return agent = characterPositions.get(i);
-				}
-			}
-		} else {
-			return agent;
-		}
-		return null;
-	}
 
 	public ArrayList<CharacterPosition> getCharacterPositions() {
 		return characterPositions;
@@ -29,9 +15,9 @@ public class State {
 	public State(State prevState, char dir) {
 		char[][] oldArray = prevState.getStateArray();
 		stateArray = new char[oldArray.length][oldArray[0].length];
-		for (int x = 0; x < oldArray[0].length; ++x) {
-			for (int y = 0; y < oldArray.length; ++y) {
-				stateArray[y][x] = oldArray[y][x];
+		for (int y = 0; y < oldArray.length; ++y) {
+			for (int x = 0; x < oldArray[0].length; ++x) {
+				stateArray[x][y] = oldArray[x][y];
 			}
 		}
 		ArrayList<CharacterPosition> prevCharacterPositions = prevState.getCharacterPositions();
@@ -39,11 +25,24 @@ public class State {
 			CharacterPosition prevPos = prevCharacterPositions.get(i);
 			CharacterPosition newPos = new CharacterPosition(prevPos.getChar(), prevPos.x(), prevPos.y());
 			characterPositions.add(newPos);
-			if (newPos.getChar() == 'A') {
-				agent = newPos;
+		}
+		agent = new CharacterPosition('A', prevState.getAgentX(), prevState.getAgentY());
+		this.move(dir);
+	}
+
+	public int getHeuristicEstimate() {
+		ArrayList<CharacterPosition> finalChars = Tree.getFinalCharacterPositions();
+		int heuristicEstimate = 0;
+		for (int i = 0; i < finalChars.size(); ++i) {
+			for (int j = 0; j < characterPositions.size(); ++j) {
+				if (finalChars.get(i).getChar() == characterPositions.get(j).getChar()) {
+					int estimatedDistance = getEstimatedDistance(characterPositions.get(j), finalChars.get(i));
+					characterPositions.get(j).setEstimatedDistance(estimatedDistance);
+					heuristicEstimate += estimatedDistance;
+				}
 			}
 		}
-		this.move(dir);
+		return heuristicEstimate;
 	}
 
 	private int getEstimatedDistance(CharacterPosition a, CharacterPosition b) {
@@ -53,25 +52,21 @@ public class State {
 	}
 
 	public State(char[][] stateArray) {
-		this.stateArray = stateArray.clone();
-		for (int x = 0; x < stateArray[0].length; ++x) {
-			for (int y = 0; y < stateArray.length; ++y) {
-				if (stateArray[y][x] != 'N') {
-					CharacterPosition cp = new CharacterPosition(stateArray[y][x], x, y);
+		for (int y = 0; y < stateArray.length; ++y) {
+			for (int x = 0; x < stateArray[0].length; ++x) {
+				this.stateArray = new char[stateArray.length][stateArray.length];
+				this.stateArray[x][y] = stateArray[x][y];
+				if (stateArray[x][y] != 'N') {
+					CharacterPosition cp = new CharacterPosition(stateArray[x][y], x, y);
 					if (cp.getChar() == 'A') {
 						agent = cp;
+					} else {
+						characterPositions.add(cp);
 					}
-					ArrayList<CharacterPosition> finalChars = Tree.getFinalCharacterPositions();
-					for (int i = 0; i < finalChars.size(); ++i) {
-						if (finalChars.get(i).getChar() == cp.getChar()) {
-							int estimatedDistance = getEstimatedDistance(cp, finalChars.get(i));
-							cp.setEstimatedDistance(estimatedDistance);
-						}
-					}
-					characterPositions.add(cp);
 				}
 			}
 		}
+		Tree.printState(stateArray);
 	}
 
 	public void move(char dir) {
@@ -99,9 +94,9 @@ public class State {
 		}
 		State otherState = (State) state;
 
-		for (int x = 0; x < stateArray[0].length; ++x) {
-			for (int y = 0; y < stateArray.length; ++y) {
-				if (stateArray[y][x] != otherState.getStateArray()[y][x]) {
+		for (int y = 0; y < stateArray.length; ++y) {
+			for (int x = 0; x < stateArray[0].length; ++x) {
+				if (stateArray[x][y] != otherState.getStateArray()[x][y]) {
 					return false;
 				}
 			}
@@ -190,7 +185,8 @@ public class State {
 	private void moveDown() {
 		agent.setY(getAgentY() - 1);
 		if (withinBounds()) {
-			CharacterPosition prevChar = findChar(stateArray[getAgentX()][getAgentY()]);			stateArray[getAgentX()][getAgentY()] = 'A';
+			CharacterPosition prevChar = findChar(stateArray[getAgentX()][getAgentY()]);
+			stateArray[getAgentX()][getAgentY()] = 'A';
 			if (prevChar != null) {
 				stateArray[getAgentX()][getAgentY() + 1] = prevChar.getChar();
 				prevChar.setY(prevChar.y() - 1);

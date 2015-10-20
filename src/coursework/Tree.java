@@ -17,9 +17,9 @@ public class Tree {
 	
 	public Tree(int n, char[] chars) {
 		char[][] startStateArray = new char[n][n];
-		for (int x = 0; x < startStateArray[0].length; ++x) {
-			for (int y = 0; y < startStateArray.length; ++y) {
-				startStateArray[y][x] = 'N';
+		for (int y = 0; y < startStateArray[0].length; ++y) {
+			for (int x = 0; x < startStateArray.length; ++x) {
+				startStateArray[x][y] = 'N';
 			}
 		}
 		for (int i = 0; i < chars.length; ++i) {
@@ -37,9 +37,9 @@ public class Tree {
 	private void generateFinalState(int n, char[] chars) {
 		char[][] finalStateArray = new char[n][n];
 		while (true) {
-			for (int x = 0; x < startState.getStateArray()[0].length; ++x) {
-				for (int y = 0; y < startState.getStateArray().length; ++y) {
-					finalStateArray[y][x] = 'N';
+			for (int y = 0; y < startState.getStateArray()[0].length; ++y) {
+				for (int x = 0; x < startState.getStateArray().length; ++x) {
+					finalStateArray[x][y] = 'N';
 				}
 			}
 			for (int i = 0; i < chars.length; ++i) {
@@ -50,10 +50,10 @@ public class Tree {
 			}
 		}
 		finalState = new State(finalStateArray);
-		for (int x = 0; x < finalStateArray[0].length; ++x) {
-			for (int y = 0; y < finalStateArray.length; ++y) {
-				if (finalStateArray[y][x] != 'N') {
-					CharacterPosition cp = new CharacterPosition(finalStateArray[y][x], x, y);
+		for (int y = 0; y < finalStateArray[0].length; ++y) {
+			for (int x = 0; x < finalStateArray.length; ++x) {
+				if (finalStateArray[x][y] != 'N') {
+					CharacterPosition cp = new CharacterPosition(finalStateArray[x][y], y, x);
 					finalCharacterPositions.add(cp);
 				}
 			}
@@ -64,16 +64,16 @@ public class Tree {
 		Random rand = new Random();
 		boolean placeFound = false;
 		while (!placeFound) {
-			int x = rand.nextInt(n);
 			int y = rand.nextInt(n);
-			if (arr[y][x] == 'N') {
-				arr[y][x] = c;
+			int x = rand.nextInt(n);
+			if (arr[x][y] == 'N') {
+				arr[x][y] = c;
 				if (c == 'A') {
 					if (placeAgent) {
-						agentX = y;
-						agentY = x;
+						agentX = x;
+						agentY = y;
 					} else {
-						arr[y][x] = 'N';
+						arr[x][y] = 'N';
 					}
 				}
 				placeFound = true;
@@ -88,9 +88,9 @@ public class Tree {
 	}
 
 	public static void printState(char[][] s) {
-		for (int x = 0; x < s[0].length; ++x) {
-			for (int y = 0; y < s.length; ++y) {
-				System.out.print(s[y][x] + ", ");
+		for (int y = 0; y < s[0].length; ++y) {
+			for (int x = 0; x < s.length; ++x) {
+				System.out.print(s[x][y] + ", ");
 			}
 			System.out.println();
 		}
