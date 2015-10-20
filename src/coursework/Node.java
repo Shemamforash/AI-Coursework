@@ -1,17 +1,51 @@
 package coursework;
 
+import java.util.ArrayList;
+
 public class Node {
 	private State	state;
 	private Node	leftNode, rightNode, upNode, downNode, parent;
 	private Boolean	visited	= false;
 	private Tree	tree;
+	private int heuristicEstimate = 0;
+	
+	public int getHeuristicEstimate(){
+		return heuristicEstimate;
+	}
+	
+	public void setHeuristicEstimate(int heuristicEstimate){
+		this.heuristicEstimate = heuristicEstimate;
+	}
 
 	public Node(State state, Node parent, Tree tree) {
 		this.tree = tree;
 		this.state = state;
 		this.parent = parent;
+		heuristicEstimate = calculateHeuristic(state, tree.getFinalState());
 	}
 
+	private int calculateHeuristic(State aState, State bState) {
+		ArrayList<CharacterPosition> aList = aState.getCharacterPositions();
+		ArrayList<CharacterPosition> bList = bState.getCharacterPositions();
+		int heuristicEstimate = 0;
+		for (int i = 0; i < aList.size(); ++i) {
+			for (int j = 0; j < bList.size(); ++j) {
+				if (aList.get(i).getChar() == bList.get(j).getChar()) {
+					int estimatedDistance = getEstimatedDistance(bList.get(j), aList.get(i));
+					heuristicEstimate += estimatedDistance;
+				}
+			}
+		}
+		return heuristicEstimate;
+	}
+
+	private int getEstimatedDistance(CharacterPosition a, CharacterPosition b) {
+		int xDiff = Math.abs(a.x() - b.x());
+		int yDiff = Math.abs(a.y() - b.y());
+		return xDiff + yDiff;
+	}
+
+	
 	public State getState() {
 		return state;
 	}
