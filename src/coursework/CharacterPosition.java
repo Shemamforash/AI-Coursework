@@ -1,17 +1,8 @@
 package coursework;
 
 class CharacterPosition {
-	private int x, y, estimatedDistance;
+	private int x, y;
 	private char c;
-	
-
-	public void setEstimatedDistance(int estimatedDistance){
-		this.estimatedDistance = estimatedDistance;
-	}
-	
-	public int getEstimatedDistance(){
-		return estimatedDistance;
-	}
 	
 	public CharacterPosition(char c, int x, int y) {
 		this.c = c;

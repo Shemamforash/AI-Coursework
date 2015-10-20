@@ -5,13 +5,13 @@ import java.util.Random;
 
 public class Tree {
 	private Node startNode;
-	private static ArrayList<State> existingStates;
+	private ArrayList<State> existingStates;
 	private State startState;
-	private static State finalState;
+	private State finalState;
 	private int agentX, agentY;
-	private static ArrayList<CharacterPosition> finalCharacterPositions = new ArrayList<CharacterPosition>();
+	private ArrayList<CharacterPosition> finalCharacterPositions = new ArrayList<CharacterPosition>();
 
-	public static ArrayList<CharacterPosition> getFinalCharacterPositions(){
+	public ArrayList<CharacterPosition> getFinalCharacterPositions(){
 		return finalCharacterPositions;
 	}
 	
@@ -25,12 +25,12 @@ public class Tree {
 		for (int i = 0; i < chars.length; ++i) {
 			placeChar(startStateArray, chars[i], n, true);
 		}
-		startState = new State(startStateArray);
+		startState = new State(startStateArray, this);
 		generateFinalState(n, chars);
 		refresh();
 	}
 
-	public static State getFinalState() {
+	public State getFinalState() {
 		return finalState;
 	}
 
@@ -43,24 +43,17 @@ public class Tree {
 				}
 			}
 			for (int i = 0; i < chars.length; ++i) {
-				placeChar(finalStateArray, chars[i], n, false);
+				finalCharacterPositions.add(placeChar(finalStateArray, chars[i], n, false));
 			}
 			if (!finalStateArray.equals(startState.getStateArray())) {
 				break;
 			}
 		}
-		finalState = new State(finalStateArray);
-		for (int y = 0; y < finalStateArray[0].length; ++y) {
-			for (int x = 0; x < finalStateArray.length; ++x) {
-				if (finalStateArray[x][y] != 'N') {
-					CharacterPosition cp = new CharacterPosition(finalStateArray[x][y], y, x);
-					finalCharacterPositions.add(cp);
-				}
-			}
-		}
+		finalState = new State(finalStateArray, this);
 	}
 
-	private void placeChar(char[][] arr, char c, int n, boolean placeAgent) {
+	private CharacterPosition placeChar(char[][] arr, char c, int n, boolean placeAgent) {
+		CharacterPosition cp = null;
 		Random rand = new Random();
 		boolean placeFound = false;
 		while (!placeFound) {
@@ -76,18 +69,20 @@ public class Tree {
 						arr[x][y] = 'N';
 					}
 				}
+				cp = new CharacterPosition(arr[x][y], x, y);
 				placeFound = true;
 			}
 		}
+		return cp;
 	}
 
 	public void refresh() {
 		existingStates = new ArrayList<State>();
 		addStateToExisting(startState);
-		startNode = new Node(startState, null);
+		startNode = new Node(startState, null, this);
 	}
 
-	public static void printState(char[][] s) {
+	public void printState(char[][] s) {
 		for (int y = 0; y < s[0].length; ++y) {
 			for (int x = 0; x < s.length; ++x) {
 				System.out.print(s[x][y] + ", ");
@@ -97,7 +92,7 @@ public class Tree {
 		System.out.println();
 	}
 
-	public static boolean stateExists(State state) {
+	public boolean stateExists(State state) {
 		for (State s : existingStates) {
 			if (s.equals(state)) {
 				return true;
@@ -111,7 +106,7 @@ public class Tree {
 		return startNode;
 	}
 
-	private static void addStateToExisting(State state) {
+	private void addStateToExisting(State state) {
 		existingStates.add(state);
 	}
 

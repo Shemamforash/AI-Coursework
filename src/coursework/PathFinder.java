@@ -49,8 +49,6 @@ public class PathFinder {
 				if (stateArray[x][y] != finalArray[x][y]) {
 					if (stateArray[x][y] == 'A' && finalArray[x][y] == 'N') {
 						continue;
-					} else if (stateArray[x][y] == 'N' && finalArray[x][y] == 'A') {
-						continue;
 					} else {
 						return false;
 					}

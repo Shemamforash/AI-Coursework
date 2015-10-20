@@ -4,15 +4,17 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class State {
-	private char[][] stateArray;
-	private ArrayList<CharacterPosition> characterPositions = new ArrayList<CharacterPosition>();
-	private CharacterPosition agent;
+	private char[][]						stateArray;
+	private ArrayList<CharacterPosition>	characterPositions	= new ArrayList<CharacterPosition>();
+	private CharacterPosition				agent;
+	private Tree							tree;
 
 	public ArrayList<CharacterPosition> getCharacterPositions() {
 		return characterPositions;
 	}
 
-	public State(State prevState, char dir) {
+	public State(State prevState, char dir, Tree tree) {
+		this.tree = tree;
 		char[][] oldArray = prevState.getStateArray();
 		stateArray = new char[oldArray.length][oldArray[0].length];
 		for (int y = 0; y < oldArray.length; ++y) {
@@ -31,13 +33,12 @@ public class State {
 	}
 
 	public int getHeuristicEstimate() {
-		ArrayList<CharacterPosition> finalChars = Tree.getFinalCharacterPositions();
+		ArrayList<CharacterPosition> finalChars = tree.getFinalCharacterPositions();
 		int heuristicEstimate = 0;
 		for (int i = 0; i < finalChars.size(); ++i) {
 			for (int j = 0; j < characterPositions.size(); ++j) {
 				if (finalChars.get(i).getChar() == characterPositions.get(j).getChar()) {
 					int estimatedDistance = getEstimatedDistance(characterPositions.get(j), finalChars.get(i));
-					characterPositions.get(j).setEstimatedDistance(estimatedDistance);
 					heuristicEstimate += estimatedDistance;
 				}
 			}
@@ -51,10 +52,11 @@ public class State {
 		return xDiff + yDiff;
 	}
 
-	public State(char[][] stateArray) {
+	public State(char[][] stateArray, Tree tree) {
+		this.tree = tree;
+		this.stateArray = new char[stateArray.length][stateArray.length];
 		for (int y = 0; y < stateArray.length; ++y) {
 			for (int x = 0; x < stateArray[0].length; ++x) {
-				this.stateArray = new char[stateArray.length][stateArray.length];
 				this.stateArray[x][y] = stateArray[x][y];
 				if (stateArray[x][y] != 'N') {
 					CharacterPosition cp = new CharacterPosition(stateArray[x][y], x, y);
@@ -66,25 +68,24 @@ public class State {
 				}
 			}
 		}
-		Tree.printState(stateArray);
 	}
 
 	public void move(char dir) {
 		switch (dir) {
-		case 'L':
-			moveLeft();
-			break;
-		case 'D':
-			moveDown();
-			break;
-		case 'R':
-			moveRight();
-			break;
-		case 'U':
-			moveUp();
-			break;
-		default:
-			break;
+			case 'L':
+				moveLeft();
+				break;
+			case 'D':
+				moveDown();
+				break;
+			case 'R':
+				moveRight();
+				break;
+			case 'U':
+				moveUp();
+				break;
+			default:
+				break;
 		}
 	}
 
@@ -131,7 +132,7 @@ public class State {
 			CharacterPosition prevChar = findChar(stateArray[getAgentX()][getAgentY()]);
 			stateArray[getAgentX()][getAgentY()] = 'A';
 			if (prevChar != null) {
-				prevChar.setX(prevChar.x() + 1);
+				prevChar.setX(prevChar.x() - 1);
 				stateArray[getAgentX() - 1][getAgentY()] = prevChar.getChar();
 			} else {
 				stateArray[getAgentX() - 1][getAgentY()] = 'N';
@@ -147,7 +148,7 @@ public class State {
 			CharacterPosition prevChar = findChar(stateArray[getAgentX()][getAgentY()]);
 			stateArray[getAgentX()][getAgentY()] = 'A';
 			if (prevChar != null) {
-				prevChar.setX(prevChar.x() - 1);
+				prevChar.setX(prevChar.x() + 1);
 				stateArray[getAgentX() + 1][getAgentY()] = prevChar.getChar();
 			} else {
 				stateArray[getAgentX() + 1][getAgentY()] = 'N';
@@ -158,18 +159,18 @@ public class State {
 	}
 
 	private void moveUp() {
-		agent.setY(getAgentY() + 1);
+		agent.setY(getAgentY() - 1);
 		if (withinBounds()) {
 			CharacterPosition prevChar = findChar(stateArray[getAgentX()][getAgentY()]);
 			stateArray[getAgentX()][getAgentY()] = 'A';
 			if (prevChar != null) {
-				stateArray[getAgentX()][getAgentY() - 1] = prevChar.getChar();
+				stateArray[getAgentX()][getAgentY() + 1] = prevChar.getChar();
 				prevChar.setY(prevChar.y() + 1);
 			} else {
-				stateArray[getAgentX()][getAgentY() - 1] = 'N';
+				stateArray[getAgentX()][getAgentY() + 1] = 'N';
 			}
 		} else {
-			agent.setY(getAgentY() - 1);
+			agent.setY(getAgentY() + 1);
 		}
 	}
 
@@ -183,18 +184,18 @@ public class State {
 	}
 
 	private void moveDown() {
-		agent.setY(getAgentY() - 1);
+		agent.setY(getAgentY() + 1);
 		if (withinBounds()) {
 			CharacterPosition prevChar = findChar(stateArray[getAgentX()][getAgentY()]);
 			stateArray[getAgentX()][getAgentY()] = 'A';
 			if (prevChar != null) {
-				stateArray[getAgentX()][getAgentY() + 1] = prevChar.getChar();
+				stateArray[getAgentX()][getAgentY() - 1] = prevChar.getChar();
 				prevChar.setY(prevChar.y() - 1);
 			} else {
-				stateArray[getAgentX()][getAgentY() + 1] = 'N';
+				stateArray[getAgentX()][getAgentY() - 1] = 'N';
 			}
 		} else {
-			agent.setY(getAgentY() + 1);
+			agent.setY(getAgentY() - 1);
 		}
 	}
 }
