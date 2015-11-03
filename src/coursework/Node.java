@@ -1,25 +1,13 @@
 package coursework;
 
+import java.util.ArrayList;
+
 public class Node {
 	private State	state;
-	private Node	parent, upNode, downNode, leftNode, rightNode;
+	private Node	leftNode, rightNode, upNode, downNode, parent;
 	private Boolean	visited	= false;
 	private Tree	tree;
-<<<<<<< HEAD
-	private int heuristicEstimate = 0;
-	private ArrayList<Node> children = new ArrayList<Node>();
-	
-	public Node(State state, Node parent, Tree tree) {
-		this.tree = tree;
-		this.state = state;
-		this.parent = parent;
-		heuristicEstimate = calculateHeuristic(state, tree.getFinalState());
-		if(parent == null || parent.getParent() == null){
-			expandNodes();
-//			tree.printState(state.getStateArray());
-			System.out.println("Children " + children.size());
-		}
-	}
+	private int heuristicEstimate = 0, height;
 	
 	public int getHeuristicEstimate(){
 		return heuristicEstimate;
@@ -29,23 +17,22 @@ public class Node {
 		this.heuristicEstimate = heuristicEstimate;
 	}
 
-	public ArrayList<Node> getChildren(){
-		return children;
+	public Node(State state, Node parent, Tree tree) {
+		this.tree = tree;
+		this.state = state;
+		this.parent = parent;
+		heuristicEstimate = calculateHeuristic(state, tree.getFinalState());
+		Node n = this;
+		if (n != null) {
+			while (n.getParent() != null) {
+				++height;
+				n = n.getParent();
+			}
+		}
 	}
-	
-	private void expandNodes() {
-		if (generateDownNode()) {
-			children.add(downNode);
-		}
-		if (generateUpNode()) {
-			children.add(upNode);
-		}
-		if (generateRightNode()) {
-			children.add(rightNode);
-		}
-		if (generateLeftNode()) {
-			children.add(leftNode);
-		}
+
+	public int getHeight(){
+		return height;
 	}
 	
 	private int calculateHeuristic(State aState, State bState) {
@@ -67,15 +54,9 @@ public class Node {
 		int xDiff = Math.abs(a.x() - b.x());
 		int yDiff = Math.abs(a.y() - b.y());
 		return xDiff + yDiff;
-=======
-
-	public Node(State state, Node parent, Tree tree) {
-		this.tree = tree;
-		this.state = state;
-		this.parent = parent;
->>>>>>> parent of 4662b1d... moving to tree creation beforehand
 	}
 
+	
 	public State getState() {
 		return state;
 	}
@@ -90,9 +71,7 @@ public class Node {
 
 	public boolean generateLeftNode() {
 		State leftState = new State(state, 'L', tree);
-		System.out.println("Left");
-		tree.printState(leftState.getStateArray());
-		if (!tree.addState(leftState)) {
+		if (!tree.stateExists(leftState)) {
 			leftNode = new Node(leftState, this, tree);
 			return true;
 		}
@@ -101,9 +80,7 @@ public class Node {
 
 	public boolean generateRightNode() {
 		State rightState = new State(state, 'R', tree);
-		System.out.println("Right");
-		tree.printState(rightState.getStateArray());
-		if (!tree.addState(rightState)) {
+		if (!tree.stateExists(rightState)) {
 			rightNode = new Node(rightState, this, tree);
 			return true;
 		}
@@ -112,9 +89,7 @@ public class Node {
 
 	public boolean generateUpNode() {
 		State upState = new State(state, 'U', tree);
-		System.out.println("Up");
-		tree.printState(upState.getStateArray());
-		if (!tree.addState(upState)) {
+		if (!tree.stateExists(upState)) {
 			upNode = new Node(upState, this, tree);
 			return true;
 		}
@@ -123,15 +98,29 @@ public class Node {
 
 	public boolean generateDownNode() {
 		State downState = new State(state, 'D', tree);
-		System.out.println("Down");
-		tree.printState(downState.getStateArray());
-		if (!tree.addState(downState)) {
+		if (!tree.stateExists(downState)) {
 			downNode = new Node(downState, this, tree);
 			return true;
 		}
 		return false;
 	}
-	
+
+	public Node getLeft() {
+		return leftNode;
+	}
+
+	public Node getRight() {
+		return rightNode;
+	}
+
+	public Node getUp() {
+		return upNode;
+	}
+
+	public Node getDown() {
+		return downNode;
+	}
+
 	public Node getParent() {
 		return parent;
 	}

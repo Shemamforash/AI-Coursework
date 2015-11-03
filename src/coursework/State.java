@@ -7,14 +7,13 @@ public class State {
 	private char[][]						stateArray;
 	private ArrayList<CharacterPosition>	characterPositions	= new ArrayList<CharacterPosition>();
 	private CharacterPosition				agent;
-	private Tree							tree;
+	private String							stateString = new String();
 
 	public ArrayList<CharacterPosition> getCharacterPositions() {
 		return characterPositions;
 	}
 
 	public State(State prevState, char dir, Tree tree) {
-		this.tree = tree;
 		char[][] oldArray = prevState.getStateArray();
 		stateArray = new char[oldArray.length][oldArray[0].length];
 		for (int y = 0; y < oldArray.length; ++y) {
@@ -30,30 +29,22 @@ public class State {
 		}
 		agent = new CharacterPosition('A', prevState.getAgentX(), prevState.getAgentY());
 		this.move(dir);
+		setStateString();
 	}
-
-	public int getHeuristicEstimate() {
-		ArrayList<CharacterPosition> finalChars = tree.getFinalCharacterPositions();
-		int heuristicEstimate = 0;
-		for (int i = 0; i < finalChars.size(); ++i) {
-			for (int j = 0; j < characterPositions.size(); ++j) {
-				if (finalChars.get(i).getChar() == characterPositions.get(j).getChar()) {
-					int estimatedDistance = getEstimatedDistance(characterPositions.get(j), finalChars.get(i));
-					heuristicEstimate += estimatedDistance;
-				}
+	
+	private void setStateString(){
+		for (int y = 0; y < stateArray.length; ++y) {
+			for (int x = 0; x < stateArray[0].length; ++x) {
+				stateString = stateString + String.valueOf(stateArray[x][y]);
 			}
 		}
-		return heuristicEstimate;
 	}
-
-	private int getEstimatedDistance(CharacterPosition a, CharacterPosition b) {
-		int xDiff = Math.abs(a.x() - b.x());
-		int yDiff = Math.abs(a.y() - b.y());
-		return xDiff + yDiff;
+	
+	public String getStateString(){
+		return stateString;
 	}
 
 	public State(char[][] stateArray, Tree tree) {
-		this.tree = tree;
 		this.stateArray = new char[stateArray.length][stateArray.length];
 		for (int y = 0; y < stateArray.length; ++y) {
 			for (int x = 0; x < stateArray[0].length; ++x) {
@@ -68,41 +59,26 @@ public class State {
 				}
 			}
 		}
+		setStateString();
 	}
 
 	public void move(char dir) {
 		switch (dir) {
 			case 'L':
-				moveLeft();
+				move(-1, 0);
 				break;
 			case 'D':
-				moveDown();
+				move(0, 1);
 				break;
 			case 'R':
-				moveRight();
+				move(1, 0);
 				break;
 			case 'U':
-				moveUp();
+				move(0, -1);
 				break;
 			default:
 				break;
 		}
-	}
-
-	public boolean equals(Object state) {
-		if (state == null || state.getClass() != getClass()) {
-			return false;
-		}
-		State otherState = (State) state;
-
-		for (int y = 0; y < stateArray.length; ++y) {
-			for (int x = 0; x < stateArray[0].length; ++x) {
-				if (stateArray[x][y] != otherState.getStateArray()[x][y]) {
-					return false;
-				}
-			}
-		}
-		return true;
 	}
 
 	public int getAgentX() {
@@ -125,52 +101,23 @@ public class State {
 		}
 		return true;
 	}
-
-	private void moveRight() {
-		agent.setX(getAgentX() + 1);
+	
+	private void move(int xDir, int yDir){
+		agent.setX(getAgentX() + xDir);
+		agent.setY(getAgentY() + yDir);
 		if (withinBounds()) {
 			CharacterPosition prevChar = findChar(stateArray[getAgentX()][getAgentY()]);
 			stateArray[getAgentX()][getAgentY()] = 'A';
 			if (prevChar != null) {
-				prevChar.setX(prevChar.x() - 1);
-				stateArray[getAgentX() - 1][getAgentY()] = prevChar.getChar();
+				prevChar.setX(prevChar.x() - xDir);
+				prevChar.setY(prevChar.y() - yDir);
+				stateArray[getAgentX() - xDir][getAgentY() - yDir] = prevChar.getChar();
 			} else {
-				stateArray[getAgentX() - 1][getAgentY()] = 'N';
+				stateArray[getAgentX() - xDir][getAgentY() - yDir] = 'N';
 			}
 		} else {
-			agent.setX(getAgentX() - 1);
-		}
-	}
-
-	private void moveLeft() {
-		agent.setX(getAgentX() - 1);
-		if (withinBounds()) {
-			CharacterPosition prevChar = findChar(stateArray[getAgentX()][getAgentY()]);
-			stateArray[getAgentX()][getAgentY()] = 'A';
-			if (prevChar != null) {
-				prevChar.setX(prevChar.x() + 1);
-				stateArray[getAgentX() + 1][getAgentY()] = prevChar.getChar();
-			} else {
-				stateArray[getAgentX() + 1][getAgentY()] = 'N';
-			}
-		} else {
-			agent.setX(getAgentX() + 1);
-		}
-	}
-
-	private void moveUp() {
-		agent.setY(getAgentY() - 1);
-		if (withinBounds()) {
-			CharacterPosition prevChar = findChar(stateArray[getAgentX()][getAgentY()]);
-			stateArray[getAgentX()][getAgentY()] = 'A';
-			if (prevChar != null) {
-				stateArray[getAgentX()][getAgentY() + 1] = prevChar.getChar();
-				prevChar.setY(prevChar.y() + 1);
-			} else {
-				stateArray[getAgentX()][getAgentY() + 1] = 'N';
-			}
-		} else {
-			agent.setY(getAgentY() + 1);
+			agent.setX(getAgentX() - xDir);
+			agent.setY(getAgentY() - yDir);
 		}
 	}
 
@@ -181,21 +128,5 @@ public class State {
 			}
 		}
 		return null;
-	}
-
-	private void moveDown() {
-		agent.setY(getAgentY() + 1);
-		if (withinBounds()) {
-			CharacterPosition prevChar = findChar(stateArray[getAgentX()][getAgentY()]);
-			stateArray[getAgentX()][getAgentY()] = 'A';
-			if (prevChar != null) {
-				stateArray[getAgentX()][getAgentY() - 1] = prevChar.getChar();
-				prevChar.setY(prevChar.y() - 1);
-			} else {
-				stateArray[getAgentX()][getAgentY() - 1] = 'N';
-			}
-		} else {
-			agent.setY(getAgentY() - 1);
-		}
 	}
 }

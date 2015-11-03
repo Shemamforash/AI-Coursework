@@ -1,20 +1,21 @@
 package coursework;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Random;
 
 public class Tree {
-	private Node startNode;
-	private ArrayList<State> existingStates = new ArrayList<State>();
-	private State startState;
-	private State finalState;
-	private int agentX, agentY;
-	private ArrayList<CharacterPosition> finalCharacterPositions = new ArrayList<CharacterPosition>();
+	private Node							startNode;
+	private State							startState;
+	private State							finalState;
+	private int								originX, originY, agentX, agentY;
+	private ArrayList<CharacterPosition>	finalCharacterPositions	= new ArrayList<CharacterPosition>();
+	private HashMap<String, StateValue> 	stateMap = new HashMap<String, StateValue>();
 
-	public ArrayList<CharacterPosition> getFinalCharacterPositions(){
+	public ArrayList<CharacterPosition> getFinalCharacterPositions() {
 		return finalCharacterPositions;
 	}
-	
+
 	public Tree(int n, char[] chars) {
 		char[][] startStateArray = new char[n][n];
 		for (int y = 0; y < startStateArray[0].length; ++y) {
@@ -27,9 +28,7 @@ public class Tree {
 		}
 		startState = new State(startStateArray, this);
 		generateFinalState(n, chars);
-		existingStates.add(startState);
-		startNode = new Node(startState, null, this);
-		printState(startStateArray);
+		refresh();
 	}
 
 	public State getFinalState() {
@@ -65,6 +64,8 @@ public class Tree {
 				arr[x][y] = c;
 				if (c == 'A') {
 					if (placeAgent) {
+						originX = x;
+						originY = y;
 						agentX = x;
 						agentY = y;
 					} else {
@@ -77,32 +78,39 @@ public class Tree {
 		}
 		return cp;
 	}
-
-	public void printState(char[][] s) {
-		for (int y = 0; y < s[0].length; ++y) {
-			for (int x = 0; x < s.length; ++x) {
-				System.out.print(s[x][y] + ", ");
-			}
-			System.out.println();
-		}
-		System.out.println();
+	
+	enum StateValue {
+		VISITED, UNVISITED;
 	}
 
-	public boolean addState(State state) {
-		for (State s : existingStates) {
-			if (s.equals(state)) {
-				return true;
+	public void refresh() {
+		stateMap.clear();
+		stateExists(startState);
+		startNode = new Node(startState, null, this);
+		agentX = originX;
+		agentY = originY;
+	}
+
+	public boolean stateExists(State state) {
+		String stateString = null;
+		char[][] stateArray = state.getStateArray();
+		for (int y = 0; y < stateArray.length; ++y) {
+			for (int x = 0; x < stateArray[0].length; ++x) {
+				stateString = stateString + stateArray[x][y];
 			}
 		}
-		existingStates.add(state);
+		if(stateMap.containsKey(stateString)){
+			return true;
+		}
+		stateMap.put(stateString, StateValue.VISITED);
 		return false;
 	}
 
 	public Node getInitialNode() {
-		return startNode;
+		return new Node(startState, null, this);
 	}
 
 	public int getSize() {
-		return existingStates.size();
+		return stateMap.size();
 	}
 }
