@@ -1,6 +1,7 @@
 package coursework;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.PriorityQueue;
@@ -8,7 +9,8 @@ import java.util.Stack;
 
 public class PathFinder {
 	private Tree	tree;
-	private float	bfsTime	= 0, dfsTime = 0, aStarTime = 0, bfsAverageNodes = 0, dfsAverageNodes = 0, aStarAverageNodes = 0, bfsAverageHeight = 0f, dfsAverageHeight = 0f, aStarAverageHeight = 0f, idAverageNodes = 0f, idAverageHeight = 0f, idTime = 0f;
+	private Long	bfsTime	= 0L, dfsTime = 0L, aStarTime = 0L;
+	private float	bfsAverageNodes	= 0, dfsAverageNodes = 0, aStarAverageNodes = 0, bfsAverageHeight = 0f, dfsAverageHeight = 0f, aStarAverageHeight = 0f, idAverageNodes = 0f, idAverageHeight = 0f, idTime = 0f;
 
 	public static void main(String[] args) {
 		PathFinder p = new PathFinder();
@@ -17,54 +19,55 @@ public class PathFinder {
 
 	private void go() {
 		char[] intchars = new char[] { '1', '2', '3', '4', '5', '6', '7', '8', '9', '0' };
-		for (int difficulty = 3; difficulty < 10; ++difficulty) {
+		for (int difficulty = 3; difficulty < 8; ++difficulty) {
 			char[] charArr = new char[3 + 1];
 			charArr[0] = 'A';
 			for (int i = 0; i < charArr.length - 1; ++i) {
 				charArr[i + 1] = intchars[i];
 			}
-			float repetitions = 5;
+			float repetitions = 5f;
 			for (int i = 0; i < repetitions; ++i) {
-				tree = new Tree(difficulty, charArr);
-				bfsAverageHeight += breadthFirstSearch().getHeight();
-				tree.refresh();
-				dfsAverageHeight += depthFirstSearch().getHeight();
-				tree.refresh();
+				tree = new Tree(3, charArr, difficulty);
+//				breadthFirstSearch();
+//				tree.refresh();
+//				depthFirstSearch();
+//				tree.refresh();
 				aStarAverageHeight += aStar().getHeight();
-				tree.refresh();
-				idAverageHeight += iterativeDeepening().getHeight();
+//				tree.refresh();
+//				iterativeDeepening();
 			}
-			float timeDivisor = repetitions * 1000000f;
+			float timeDivisor = repetitions;
 			System.out.println("--- FINISHED ---");
 			System.out.println("Difficulty: " + difficulty);
 			System.out.println("Total repetitions: " + repetitions);
-			
+			System.out.println("-----------------------------------------------------");
 			System.out.println("-- Breadth First Search Averages --");
-			System.out.println("Time: " + (float)(bfsTime / timeDivisor));
+//			System.out.println("Time: " + (float) (bfsTime / timeDivisor));
 			System.out.println("Nodes: " + bfsAverageNodes / repetitions);
-			System.out.println("Height: " + bfsAverageHeight / repetitions);
-			
+//			System.out.println("Height: " + bfsAverageHeight / repetitions);
+			System.out.println("-----------------------------------------------------");
 			System.out.println("-- Depth First Search Averages --");
-			System.out.println("Time: " + (float)(dfsTime / timeDivisor));
+//			System.out.println("Time: " + (float) (dfsTime / timeDivisor));
 			System.out.println("Nodes: " + dfsAverageNodes / repetitions);
-			System.out.println("Height: " + dfsAverageHeight / repetitions);
-			
+//			System.out.println("Height: " + dfsAverageHeight / repetitions);
+			System.out.println("-----------------------------------------------------");
 			System.out.println("-- A* Search Averages --");
-			System.out.println("Time: " + (float)(aStarTime / timeDivisor));
+//			System.out.println("Time: " + (float) (aStarTime / timeDivisor));
 			System.out.println("Nodes: " + aStarAverageNodes / repetitions);
 			System.out.println("Height: " + aStarAverageHeight / repetitions);
-			
+			System.out.println("-----------------------------------------------------");
 			System.out.println("-- Iterative Deepening Search Averages --");
-			System.out.println("Time: " + (float)(idTime / timeDivisor));
+//			System.out.println("Time: " + (float) (idTime / timeDivisor));
 			System.out.println("Nodes: " + idAverageNodes / repetitions);
-			System.out.println("Height: " + idAverageHeight / repetitions + "\n");
+//			System.out.println("Height: " + idAverageHeight / repetitions);
+			System.out.println("+++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
 
 			bfsAverageNodes = 0;
 			dfsAverageNodes = 0;
 			aStarAverageNodes = 0;
-			bfsTime = 0;
-			dfsTime = 0;
-			aStarTime = 0;
+			bfsTime = 0L;
+			dfsTime = 0L;
+			aStarTime = 0L;
 			bfsAverageHeight = 0f;
 			dfsAverageHeight = 0f;
 			aStarAverageHeight = 0f;
@@ -77,7 +80,7 @@ public class PathFinder {
 	private boolean isFinalState(Node n) {
 		String stateString = n.getState().getStateString();
 		stateString = stateString.replace('A', 'N');
-		if(stateString.equals(tree.getFinalState().getStateString())){
+		if (stateString.equals(tree.getFinalState().getStateString())) {
 			return true;
 		}
 		return false;
@@ -97,6 +100,7 @@ public class PathFinder {
 		if (node.generateLeftNode()) {
 			nodes.add(node.getLeft());
 		}
+		Collections.shuffle(nodes);
 		return nodes;
 	}
 
@@ -112,9 +116,9 @@ public class PathFinder {
 			return 0;
 		}
 	}
-	
+
 	private Node aStar() {
-		float startTime = System.nanoTime();
+		Long startTime = System.nanoTime();
 		ArrayList<Node> visitedNodes = new ArrayList<Node>();
 		PriorityQueue<Node> unvisitedNodes = new PriorityQueue<Node>(new HeuristicEstimateComparator());
 		unvisitedNodes.add(tree.getInitialNode());
@@ -139,11 +143,11 @@ public class PathFinder {
 		return null;
 	}
 
-	private Node iterativeDeepening(){
-		float startTime = System.nanoTime();
+	private Node iterativeDeepening() {
+		Long startTime = System.nanoTime();
 		Stack<Node> nodeStack = new Stack<Node>();
 		int depth = 0;
-		while(true){
+		while (true) {
 			tree.refresh();
 			nodeStack.clear();
 			nodeStack.push(tree.getInitialNode());
@@ -157,7 +161,7 @@ public class PathFinder {
 						if (isFinalState(n)) {
 							idTime += System.nanoTime() - startTime;
 							return n;
-						} else if(n.getHeight() <= depth){
+						} else if (n.getHeight() <= depth) {
 							nodeStack.push(n);
 						}
 					}
@@ -170,10 +174,14 @@ public class PathFinder {
 	private Node depthFirstSearch() {
 		Stack<Node> nodeStack = new Stack<Node>();
 		nodeStack.push(tree.getInitialNode());
-		float startTime = System.nanoTime();
+		Long startTime = System.nanoTime();
+		int nodesExplored = 0;
 		while (!nodeStack.isEmpty()) {
 			Node node = nodeStack.pop();
 			++dfsAverageNodes;
+			if(nodesExplored > 10000000){
+				break;
+			}
 			if (!node.getVisited()) {
 				node.setVisited(true);
 				ArrayList<Node> nodes = expandNodes(node);
@@ -188,9 +196,9 @@ public class PathFinder {
 		}
 		return null;
 	}
-	
+
 	private Node breadthFirstSearch() {
-		float startTime = System.nanoTime();
+		Long startTime = System.nanoTime();
 		LinkedList<Node> nodeQueue = new LinkedList<Node>();
 		nodeQueue.add(tree.getInitialNode());
 		while (!nodeQueue.isEmpty()) {

@@ -71,7 +71,7 @@ public class Node {
 
 	public boolean generateLeftNode() {
 		State leftState = new State(state, 'L', tree);
-		if (!tree.stateExists(leftState)) {
+		if (!tree.checkState() || !tree.stateExists(leftState)) {
 			leftNode = new Node(leftState, this, tree);
 			return true;
 		}
@@ -80,7 +80,7 @@ public class Node {
 
 	public boolean generateRightNode() {
 		State rightState = new State(state, 'R', tree);
-		if (!tree.stateExists(rightState)) {
+		if (!tree.checkState() || !tree.stateExists(rightState)) {
 			rightNode = new Node(rightState, this, tree);
 			return true;
 		}
@@ -89,7 +89,7 @@ public class Node {
 
 	public boolean generateUpNode() {
 		State upState = new State(state, 'U', tree);
-		if (!tree.stateExists(upState)) {
+		if (!tree.checkState() || !tree.stateExists(upState)) {
 			upNode = new Node(upState, this, tree);
 			return true;
 		}
@@ -98,7 +98,7 @@ public class Node {
 
 	public boolean generateDownNode() {
 		State downState = new State(state, 'D', tree);
-		if (!tree.stateExists(downState)) {
+		if (!tree.checkState() || !tree.stateExists(downState)) {
 			downNode = new Node(downState, this, tree);
 			return true;
 		}
