@@ -7,7 +7,6 @@ import java.util.Random;
 public class Tree {
 	private Node							startNode;
 	private State							startState;
-	private State							finalState;
 	private int								originX, originY, agentX, agentY;
 	private ArrayList<CharacterPosition>	finalCharacterPositions	= new ArrayList<CharacterPosition>();
 	private HashMap<String, StateValue>		stateMap				= new HashMap<String, StateValue>();
@@ -22,24 +21,9 @@ public class Tree {
 	}
 
 	public Tree(int n, char[] chars, int difficulty) {
-		char[][] startStateArray = new char[n][n];
-		for (int y = 0; y < startStateArray[0].length; ++y) {
-			for (int x = 0; x < startStateArray.length; ++x) {
-				startStateArray[x][y] = 'N';
-			}
-		}
-		for (int i = 0; i < chars.length; ++i) {
-			placeChar(startStateArray, chars[i], n, true);
-		}
-		startState = new State(startStateArray, this);
-		generateFinalState(n, chars, difficulty);
+		generateStartState(n, chars, difficulty);
 		printState(startState.getStateArray());
-		printState(finalState.getStateArray());
 		refresh();
-	}
-
-	public State getFinalState() {
-		return finalState;
 	}
 
 	public void printState(char[][] s) {
@@ -52,50 +36,18 @@ public class Tree {
 		System.out.println();
 	}
 	
-	private void generateFinalState(int n, char[] chars, int difficulty) {		
-		char[][] finalStateArray = new char[n][n];
+	private void generateStartState(int n, char[] chars, int difficulty) {		
+		char[][] startStateArray = new char[n][n];
 
-		for (int y = 0; y < finalStateArray[0].length; ++y) {
-			for (int x = 0; x < finalStateArray.length; ++x) {
-				finalStateArray[x][y] = startState.getStateArray()[x][y];
-				if(finalStateArray[x][y] == 'A'){
-					finalStateArray[x][y] = 'N';
+		for (int y = 0; y < startStateArray[0].length; ++y) {
+			for (int x = 0; x < startStateArray.length; ++x) {
+				if(y == 0){
+					startStateArray[x][y] = chars[x + 1];
+				} else {
+					startStateArray[x][y] = 'N';
 				}
 			}
 		}
-//		
-//		finalState = new State(finalStateArray, this);
-//		
-//		for(int i = 0; i < difficulty; ++i){
-//			int switchVal = new Random().nextInt(4);
-//			switch(switchVal){
-//				case 0:
-//					finalState.move('L');
-//					break;
-//				case 1:
-//					finalState.move('R');
-//					break;
-//				case 2:
-//					finalState.move('D');
-//					break;
-//				case 3:
-//					finalState.move('U');
-//					break;
-//			}
-//		}
-//		
-//		finalStateArray = finalState.getStateArray();
-//		
-//		for (int y = 0; y < finalStateArray[0].length; ++y) {
-//			for (int x = 0; x < finalStateArray.length; ++x) {
-//				finalStateArray[x][y] = startState.getStateArray()[x][y];
-//				if(finalStateArray[x][y] == 'A'){
-//					finalStateArray[x][y] = 'N';
-//				}
-//			}
-//		}
-//		
-//		finalState = new State(finalStateArray, this);
 		
 		for(int i = 0; i < difficulty; ++i){
 			int val = new Random().nextInt(3);
@@ -103,44 +55,28 @@ public class Tree {
 			boolean flip = new Random().nextBoolean();
 			if(moveRow){
 				if(flip){
-					char store = finalStateArray[0][val];
-					finalStateArray[0][val] = finalStateArray[1][val];
-					finalStateArray[1][val] = store;
+					char store = startStateArray[0][val];
+					startStateArray[0][val] = startStateArray[1][val];
+					startStateArray[1][val] = store;
 				} else{
-					char store = finalStateArray[1][val];
-					finalStateArray[1][val] = finalStateArray[2][val];
-					finalStateArray[2][val] = store;
+					char store = startStateArray[1][val];
+					startStateArray[1][val] = startStateArray[2][val];
+					startStateArray[2][val] = store;
 				}
 			}else{
 				if(flip){
-					char store = finalStateArray[val][0];
-					finalStateArray[val][0] = finalStateArray[val][1];
-					finalStateArray[val][1] = store;
+					char store = startStateArray[val][0];
+					startStateArray[val][0] = startStateArray[val][1];
+					startStateArray[val][1] = store;
 				} else{
-					char store = finalStateArray[val][1];
-					finalStateArray[val][1] = finalStateArray[val][2];
-					finalStateArray[val][2] = store;
+					char store = startStateArray[val][1];
+					startStateArray[val][1] = startStateArray[val][2];
+					startStateArray[val][2] = store;
 				}
 			}
 		}
 		
-		finalState = new State(finalStateArray, this);
-		
-//		char[][] finalStateArray = new char[n][n];
-//		while (true) {
-//			for (int y = 0; y < startState.getStateArray()[0].length; ++y) {
-//				for (int x = 0; x < startState.getStateArray().length; ++x) {
-//					finalStateArray[x][y] = 'N';
-//				}
-//			}
-//			for (int i = 0; i < chars.length; ++i) {
-//				finalCharacterPositions.add(placeChar(finalStateArray, chars[i], n, false));
-//			}
-//			if (!finalStateArray.equals(startState.getStateArray())) {
-//				break;
-//			}
-//		}
-//		finalState = new State(finalStateArray, this);
+		startState = new State(startStateArray, this);
 	}
 
 	private CharacterPosition placeChar(char[][] arr, char c, int n, boolean placeAgent) {
